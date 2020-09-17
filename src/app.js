@@ -4,7 +4,14 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
+const ArticlesService = require('./article-service')
 const app = express()
+
+app.get('./articles',(req,res,next)=>{
+  const knexInstance = req.app.get('db')
+  ArticlesService.getAll(knexInstance)
+  .then(articles =>{res.json(articles)}).catch(next)
+})
 app.get('/', (req, res) => {
        res.send('Hello, world!')
      })
