@@ -10,23 +10,14 @@ articlesRouter.route('/articles').get((req,res,next)=>{
         res.json(articles)
     }).catch(next)
 }).post(jsonParser,(req,res,next)=>{
-    const { title, content, style } = req.body
-    if(!title){
-        return res.status(400).json({
-            error:{message:'missing title'}
-        })
-    }
-    if(!content){
-        return res.status(400).json({
-            error:{message:'missing content'}
-        })
-    }
-    if(!style){
-        return res.status(400).json({
-            error:{message:'missing style'}
-        })
-    }
+    const { title, content, style, author } = req.body
     const newArticle = { title, content, style }
+    for (const [key, value] of Object.entries(newArticle)){
+      if (value == null){
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` }
+    })}}
+    newArticle.author = author
     ArticlesService.insertArticle(
       req.app.get('db'),
       newArticle
@@ -59,7 +50,8 @@ articlesRouter.route('/articles/:article_id')
             style: res.article.style,
             title: xss(res.article.title),
             content: xss(res.article.content),
-            date_published: res.article.date_published
+            date_published: res.article.date_published,
+            author: res.article.author
         })
     }       
 ).delete((req,res,next)=>{
